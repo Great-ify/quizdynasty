@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign Protocol Quiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0; padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .quiz-container {
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 600px;
+      padding: 20px;
+    }
+    .quiz-header {
+      margin-bottom: 20px;
+    }
+    .question {
+      font-size: 1.2em;
+      margin-bottom: 15px;
+    }
+    .options {
+      list-style: none;
+      padding: 0;
+    }
+    .options li {
+      margin-bottom: 10px;
+    }
+    .options li button {
+      width: 100%;
+      padding: 10px 15px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #fff;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .options li button:hover {
+      background-color: #ffe8cc;
+    }
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      font-size: 1em;
+      border: none;
+      border-radius: 5px;
+      background-color: #ff7f00; /* Sign Protocol Orange */
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .btn:hover {
+      background-color: #e56c00;
+    }
+    .score-container {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container" id="quiz">
+    <div class="quiz-header">
+      <h2>Sign Protocol Quiz</h2>
+    </div>
+    <div id="question-container">
+      <!-- Questions will be dynamically inserted here -->
+    </div>
+    <div id="controls">
+      <button class="btn" id="next-btn">Next</button>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "What kind of protocol is Sign Protocol?",
+        options: ["Single-chain attestation","Omni-chain attestation","Centralized verification","Private-only ledger"],
+        answer: "Omni-chain attestation"
+      },
+      {
+        question: "What is Sign Protocol designed to make information on the internet?",
+        options: ["Less opaque","Verifiable and portable across blockchains","Faster to hack","Blockchain-specific only"],
+        answer: "Verifiable and portable across blockchains"
+      },
+      {
+        question: "Which storage options does Sign Protocol support?",
+        options: ["Fully on-chain only","Fully off-chain only","Hybrid, off-chain (e.g., Arweave or IPFS), or on-chain","Only with centralized databases"],
+        answer: "Hybrid, off-chain (e.g., Arweave or IPFS), or on-chain"
+      },
+      {
+        question: "What does Sign Protocol use to verify consent or signatures?",
+        options: ["Proof-of-Work","Digital signatures and zero-knowledge proofs","Plain text passwords","Centralized authorities"],
+        answer: "Digital signatures and zero-knowledge proofs"
+      },
+      {
+        question: "Which of the following is a Sign Protocol product for token distribution and airdrops?",
+        options: ["SignPass","TokenTable","EthSign Doc","SignLedger"],
+        answer: "TokenTable"
+      },
+      {
+        question: "Is Sign Protocol dependent on a specific blockchain like only Ethereum or EVM-based chains?",
+        options: ["Yes, only Ethereum","Yes, only EVM based chains","No, it's independent / omni-chain","Only works on Layer 2s"],
+        answer: "No, it's independent / omni-chain"
+      },
+      {
+        question: "How many SIGN tokens are there total (total supply)?",
+        options: ["1 billion","5 billion","10 billion","100 million"],
+        answer: "10 billion"
+      },
+      {
+        question: "What is the name of Sign Protocol’s legally compliant signature product?",
+        options: ["CertSign","EthSign","LegalSign","SignProof"],
+        answer: "EthSign"
+      },
+      {
+        question: "Which off-chain storage options are used by Sign Protocol?",
+        options: ["Dropbox or Google Drive","Only IPFS","Arweave and IPFS","No off-chain storage allowed"],
+        answer: "Arweave and IPFS"
+      },
+      {
+        question: "Which principle is *not* one of Sign Protocol’s guiding philosophies?",
+        options: ["Simplicity (“Keep It Simple, Signer”)","Adaptability (“Improvise. Adapt. Excel”)","Centralization","Openness (“Open Protocol”)"],
+        answer: "Centralization"
+      },
+      {
+        question: "What is Sign Protocol’s main goal?",
+        options: ["To create a new blockchain from scratch","To enable verifiable attestations in Web3 across chains","To replace all smart contracts","To build a social media platform"],
+        answer: "To enable verifiable attestations in Web3 across chains"
+      }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let shuffledQuestions = [];
+
+    const questionContainer = document.getElementById('question-container');
+    const nextBtn = document.getElementById('next-btn');
+
+    function shuffleArray(arr) {
+      // Fisher-Yates shuffle
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function startQuiz() {
+      shuffledQuestions = shuffleArray([...questions]);
+      currentQuestionIndex = 0;
+      score = 0;
+      showQuestion();
+    }
+
+    function showQuestion() {
+      const q = shuffledQuestions[currentQuestionIndex];
+      questionContainer.innerHTML = `
+        <div class="question">${q.question}</div>
+        <ul class="options">
+          ${ shuffleArray([...q.options]).map(opt => `
+            <li><button class="option-btn">${opt}</button></li>
+          `).join('') }
+        </ul>
+      `;
+
+      const optionButtons = document.querySelectorAll('.option-btn');
+      optionButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (btn.innerText === q.answer) {
+            score++;
+          }
+          // disable all buttons
+          optionButtons.forEach(b => b.disabled = true);
+          // highlight correct/incorrect
+          btn.style.backgroundColor = (btn.innerText === q.answer) ? '#a4e596' : '#f28b82';
+          // find the correct one and mark it
+          optionButtons.forEach(b => {
+            if (b.innerText === q.answer) {
+              b.style.backgroundColor = '#a4e596';
+            }
+          });
+        });
+      });
+
+      if (currentQuestionIndex === shuffledQuestions.length - 1) {
+        nextBtn.innerText = 'Finish';
+      } else {
+        nextBtn.innerText = 'Next';
+      }
+    }
+
+    nextBtn.addEventListener('click', () => {
+      const optionButtons = document.querySelectorAll('.option-btn');
+      // if no option selected, do nothing
+      const anyDisabled = [...optionButtons].some(b => b.disabled);
+      if (!anyDisabled) {
+        alert('Please select an option.');
+        return;
+      }
+      currentQuestionIndex++;
+      if (currentQuestionIndex < shuffledQuestions.length) {
+        showQuestion();
+      } else {
+        showScore();
+      }
+    });
+
+    function showScore() {
+      questionContainer.innerHTML = `
+        <div class="score-container">
+          <h3>Your Score: ${score} / ${shuffledQuestions.length}</h3>
+          <button class="btn" id="restart-btn">Restart Quiz</button>
+        </div>
+      `;
+      document.getElementById('restart-btn').addEventListener('click', startQuiz);
+      nextBtn.style.display = 'none';
+    }
+
+    // initialize
+    startQuiz();
+  </script>
+</body>
+</html>
